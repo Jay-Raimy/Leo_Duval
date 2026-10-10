@@ -88,8 +88,34 @@
     let hpActuel = 51;
     let hpMax = 51;
 
-    // Préfixe unique pour Léo Duval afin de ne pas mélanger ses données avec John Doe
     const PREFIXE_PERSO = 'perso_leo_';
+
+    // Dictionnaire des profils raccourcis
+    const PROFILS_PREDEFINIS = {
+        "LEO1": {
+            "perso_leo_xp": 0,
+            "perso_leo_niveau": 1,
+            "perso_leo_hp": 51
+        },
+        "JOHN1": {
+            "perso_hp": 16,
+            "perso_niveau": 2,
+            "perso_xp": 355,
+            "perso_humanite": 30,
+            "perso_faim": 0,
+            "perso_soif": 0,
+            "perso_mutagene": 80,
+            "perso_fatigue": 0,
+            "perso_reputation": 44,
+            "perso_res_Chaud": 0,
+            "perso_res_Morsure": 15,
+            "perso_inventaire": JSON.stringify([
+                { nom: "Chêti (plante parlante accrochée à mon épaule)", poids: 1, quantite: 1 },
+                { nom: "Batte avec sangle 1D6", poids: 2, quantite: 1 },
+                { nom: "Gilet pare balles +2 esquive, +20 armure, -2 dégâts subit", poids: 0, quantite: 1 }
+            ])
+        }
+    };
 
     function chargerDonnees() {
         const xp = localStorage.getItem(PREFIXE_PERSO + 'xp');
@@ -144,25 +170,33 @@
             }
         }
         const code = btoa(JSON.stringify(toutesLesDonnees));
-        prompt("Copie ce code de transfert pour Léo Duval :", code);
+        prompt("Copie ce code de transfert :", code);
     }
 
     function importerDonnees() {
-        const code = prompt("Colle le code de transfert ici :");
-        if (code) {
+        const saisie = prompt("Colle le code de transfert ou entre un mot-clé (ex: LEO1, JOHN1) :");
+        if (!saisie) return;
+
+        let donnees = null;
+        const codeNettoye = saisie.trim().toUpperCase();
+
+        if (PROFILS_PREDEFINIS[codeNettoye]) {
+            donnees = PROFILS_PREDEFINIS[codeNettoye];
+        } else {
             try {
-                const donnees = JSON.parse(atob(code));
-                for (let cle in donnees) {
-                    if (cle.startsWith(PREFIXE_PERSO)) {
-                        localStorage.setItem(cle, donnees[cle]);
-                    }
-                }
-                alert("✅ Données de Léo Duval importées !");
-                location.reload();
+                donnees = JSON.parse(atob(saisie));
             } catch (e) {
-                alert("❌ Code invalide.");
+                alert("❌ Code ou mot-clé invalide.");
+                return;
             }
         }
+
+        for (let cle in donnees) {
+            localStorage.setItem(cle, donnees[cle]);
+        }
+        
+        alert("✅ Données importées avec succès !");
+        location.reload();
     }
 
     window.onload = chargerDonnees;
