@@ -88,10 +88,13 @@
     let hpActuel = 51;
     let hpMax = 51;
 
+    // Préfixe unique pour Léo Duval afin de ne pas mélanger ses données avec John Doe
+    const PREFIXE_PERSO = 'perso_leo_';
+
     function chargerDonnees() {
-        const xp = localStorage.getItem('perso_xp');
-        const niv = localStorage.getItem('perso_niveau');
-        const hp = localStorage.getItem('perso_hp');
+        const xp = localStorage.getItem(PREFIXE_PERSO + 'xp');
+        const niv = localStorage.getItem(PREFIXE_PERSO + 'niveau');
+        const hp = localStorage.getItem(PREFIXE_PERSO + 'hp');
         if (xp) xpActuel = parseInt(xp);
         if (niv) niveau = parseInt(niv);
         if (hp) hpActuel = parseInt(hp);
@@ -99,18 +102,15 @@
     }
 
     function sauvegarderDonnees() {
-        localStorage.setItem('perso_xp', xpActuel);
-        localStorage.setItem('perso_niveau', niveau);
-        localStorage.setItem('perso_hp', hpActuel);
+        localStorage.setItem(PREFIXE_PERSO + 'xp', xpActuel);
+        localStorage.setItem(PREFIXE_PERSO + 'niveau', niveau);
+        localStorage.setItem(PREFIXE_PERSO + 'hp', hpActuel);
     }
 
     function rafraichirAffichage() {
-        // Correction ici : ajout de l'opérateur de multiplication (*)
         document.getElementById('xp-fill').style.width = (xpActuel / xpMax * 100) + "%";
         document.getElementById('xp-current-text').innerText = xpActuel;
         document.getElementById('level-number').innerText = niveau;
-        
-        // Correction ici aussi : ajout de l'opérateur de multiplication (*)
         document.getElementById('hp-fill').style.width = (hpActuel / hpMax * 100) + "%";
         document.getElementById('hp-current-text').innerText = hpActuel;
     }
@@ -119,7 +119,7 @@
         xpActuel += v;
         if (xpActuel >= xpMax) { xpActuel -= xpMax; niveau++; }
         if (xpActuel < 0) xpActuel = 0;
-        rafraichirAffichage(); 
+        rafraichirAffichage();
         sauvegarderDonnees();
     }
 
@@ -127,7 +127,7 @@
         hpActuel += v;
         if (hpActuel > hpMax) hpActuel = hpMax;
         if (hpActuel < 0) hpActuel = 0;
-        rafraichirAffichage(); 
+        rafraichirAffichage();
         sauvegarderDonnees();
     }
 
@@ -139,12 +139,12 @@
         let toutesLesDonnees = {};
         for (let i = 0; i < localStorage.length; i++) {
             let cle = localStorage.key(i);
-            if (cle.startsWith('perso_')) {
+            if (cle.startsWith(PREFIXE_PERSO)) {
                 toutesLesDonnees[cle] = localStorage.getItem(cle);
             }
         }
         const code = btoa(JSON.stringify(toutesLesDonnees));
-        prompt("Copie ce code de transfert :", code);
+        prompt("Copie ce code de transfert pour Léo Duval :", code);
     }
 
     function importerDonnees() {
@@ -153,9 +153,11 @@
             try {
                 const donnees = JSON.parse(atob(code));
                 for (let cle in donnees) {
-                    localStorage.setItem(cle, donnees[cle]);
+                    if (cle.startsWith(PREFIXE_PERSO)) {
+                        localStorage.setItem(cle, donnees[cle]);
+                    }
                 }
-                alert("✅ Données importées !");
+                alert("✅ Données de Léo Duval importées !");
                 location.reload();
             } catch (e) {
                 alert("❌ Code invalide.");
