@@ -77,6 +77,11 @@
                     <button onclick="exporterDonnees()" class="btn-transfer exp">Exporter</button>
                     <button onclick="importerDonnees()" class="btn-transfer imp">Importer</button>
                 </div>
+                <!-- Bouton de réinitialisation complète -->
+                <button onclick="if(confirm('Es-tu sûr de vouloir tout réinitialiser ?')){ localStorage.clear(); alert('Mémoire effacée !'); location.reload(); }" 
+                        style="background-color: #e74c3c; color: white; padding: 10px; border: none; border-radius: 5px; width: 100%; margin-top: 10px; font-weight: bold; cursor: pointer;">
+                    🗑️ Réinitialiser le stockage
+                </button>
             </div>
         </div>
     </div>
