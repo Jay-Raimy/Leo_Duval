@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Inventaire</title>
+</head>
+<body>
+    <div class="background">
+        <header class="header flex justify">        
+            <nav>
+                <ul class="menu-nav">
+                    <li class="Button"><a class="main" href="leo_duval.html">Léo Duval</a></li>
+                    <li class="Button"><a class="main" href="Sante.html">Santé</a></li>
+                    <li class="Button"><a class="main" href="Inventaire.html">Inventaire</a></li>
+                    <li class="Button"><a class="main" href="Resistance.html">Résistance</a></li>
+                </ul>
+            </nav>
+        </header>
+
+<div class="xp-container">
+    <div class="stat-section">
+        <h3 style="color: white; font-family: 'Georgia', serif; text-align: center; margin-bottom: 5px;">🎒 Sac à dos</h3>
+        
+        <div style="text-align: center; margin-bottom: 10px;">
+            <span id="slots-count" style="color: #f1c40f; font-weight: bold; font-family: 'Georgia', serif;">0 / 18</span>
+        </div>
+        <div class="bar-bg" style="height: 10px; margin-bottom: 20px;">
+            <div id="slots-fill" class="bar-fill" style="width: 0%; background: linear-gradient(90deg, #f1c40f, #d4ac0d);"></div>
+        </div>
+        
+<div class="add-item-form inventory-controls">
+    <input type="text" id="item-name" placeholder="Objet..." class="input-name">
+    <input type="number" id="item-weight" value="1" min="0" step="0.1" class="input-weight">
+    <button onclick="ajouterObjet()" class="btn-plus">OK</button>
+</div>
+
+        <hr style="opacity: 0.2; margin: 20px 0;">
+
+        <div id="inventory-list" class="inventory-grid"></div>
+    </div>
+</div>
+
+<script>
+let inventaire = [];
+    const MAX_SLOTS = 18;
+
+    function chargerInventaire() {
+        const save = localStorage.getItem('perso_inventaire');
+        if (save) { inventaire = JSON.parse(save); }
+        rafraichirAffichage();
+    }
+
+    function sauvegarderInventaire() {
+        localStorage.setItem('perso_inventaire', JSON.stringify(inventaire));
+    }
+
+    function ajouterObjet() {
+        const nameInput = document.getElementById('item-name');
+        const weightInput = document.getElementById('item-weight');
+        
+        const nom = nameInput.value.trim();
+        const poidsUnitaire = parseFloat(weightInput.value) || 0; // Ex: 0.1 pour une flèche
+
+        if (!nom) return;
+
+        // On vérifie si on a encore au moins un peu de place
+        let poidsActuel = calculerPoidsTotal();
+        if (poidsActuel + poidsUnitaire > MAX_SLOTS) {
+            alert("⚠️ Plus aucune place pour ajouter cet objet !");
+            return;
+        }
+
+        inventaire.push({ 
+            nom: nom, 
+            poids: poidsUnitaire, 
+            quantite: 1 
+        });
+        
+        nameInput.value = "";
+        weightInput.value = "1";
+        sauvegarderInventaire();
+        rafraichirAffichage();
+    }
+
+    function modifierQuantite(index, delta) {
+        let item = inventaire[index];
+        let nouveauPoidsTotal = calculerPoidsTotal() + (item.poids * delta);
+
+        // Vérification si l'augmentation dépasse le sac
+        if (delta > 0 && nouveauPoidsTotal > MAX_SLOTS) {
+            alert("⚠️ Tu ne peux pas en porter plus, le sac est plein !");
+            return;
+        }
+
+        item.quantite += delta;
+
+        // Si la quantité tombe à 0, on supprime l'objet
+        if (item.quantite <= 0) {
+            supprimerObjet(index);
+        } else {
+            sauvegarderInventaire();
+            rafraichirAffichage();
+        }
+    }
+
+    function supprimerObjet(index) {
+        inventaire.splice(index, 1);
+        sauvegarderInventaire();
+        rafraichirAffichage();
+    }
+
+    function calculerPoidsTotal() {
+        return inventaire.reduce((total, item) => total + (item.poids * item.quantite), 0);
+    }
+
+    function rafraichirAffichage() {
+        const liste = document.getElementById('inventory-list');
+        const countText = document.getElementById('slots-count');
+        const fillBar = document.getElementById('slots-fill');
+        
+        liste.innerHTML = "";
+        let total = calculerPoidsTotal();
+        
+        countText.innerText = `${total.toFixed(1)} / ${MAX_SLOTS}`;
+        fillBar.style.width = (total / MAX_SLOTS * 100) + "%";
+        countText.style.color = (total >= MAX_SLOTS) ? "#e74c3c" : "#f1c40f";
+
+        inventaire.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = "inventory-item";
+            // Affichage : Quantité | Nom | Poids Total de la pile
+            div.innerHTML = `
+                <div class="item-info">
+                    <span class="qty-badge">${item.quantite}x</span>
+                    <span class="item-name">${item.nom}</span>
+                    <small style="opacity:0.6; font-size:10px; margin-left:5px;">(${(item.poids * item.quantite).toFixed(1)})</small>
+                </div>
+                <div class="item-controls">
+                    <button onclick="modifierQuantite(${index}, -1)" class="qty-btn">-</button>
+                    <button onclick="modifierQuantite(${index}, 1)" class="qty-btn">+</button>
+                    <button onclick="supprimerObjet(${index})" class="delete-btn" style="margin-left:10px;">×</button>
+                </div>
+            `;
+            liste.appendChild(div);
+        });
+    }
+
+    window.onload = chargerInventaire;
+    </script>
+</body>
+</html>

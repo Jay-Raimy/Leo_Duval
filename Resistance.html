@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Résistances</title>
+</head>
+<body>
+    <div class="background">
+        <header class="header flex justify">        
+            <nav>
+                <ul class="menu-nav">
+                    <li class="Button"><a class="main" href="leo_duval.html">Léo Duval</a></li>
+                    <li class="Button"><a class="main" href="Sante.html">Santé</a></li>
+                    <li class="Button"><a class="main" href="Inventaire.html">Inventaire</a></li>
+                    <li class="Button"><a class="main" href="Resistance.html">Résistance</a></li>
+                </ul>
+            </nav>
+        </header>
+    
+        <div class="xp-container">
+            <h2 style="color: white; font-family: 'Georgia', serif; text-align: center; margin-bottom: 20px; text-shadow: 2px 2px 4px black;"></h2>
+            
+            <div class="stats-grid">
+                </div>
+        </div>
+    </div>
+
+<script>
+    const typesResistance = [
+        'Chaud', 'Froid', 'Combat', 'Glace', 'Feu', 
+        'Explosion', 'Gaz', 'Electricité', 'Morsure', 'Corrosion'
+    ];
+
+    let resistances = {};
+
+    function chargerDonnees() {
+        typesResistance.forEach(type => {
+            const val = localStorage.getItem('perso_res_' + type);
+            resistances[type] = val ? parseInt(val) : 0;
+        });
+        genererInterface();
+    }
+
+    function genererInterface() {
+        const grid = document.querySelector('.stats-grid');
+        grid.innerHTML = "";
+
+        typesResistance.forEach(type => {
+            const section = document.createElement('div');
+            section.className = "stat-section";
+            section.innerHTML = `
+                <div class="res-label" style="color: #00d4ff; font-weight: bold; margin-bottom: 5px;">
+                    ${type} : <span id="res-val-${type}">${resistances[type]}</span>/100
+                </div>
+                <div class="bar-bg" style="height: 12px; margin-bottom: 10px;">
+                    <div id="res-fill-${type}" class="bar-fill humanite-fill" style="width: ${resistances[type]}%;"></div>
+                </div>
+                <div class="controls-grid">
+                    <button onclick="modifierRes('${type}', 5)" class="btn-plus">+5</button>
+                    <button onclick="modifierRes('${type}', 10)" class="btn-plus">+10</button>
+                    <button onclick="modifierRes('${type}', -5)" class="btn-minus">-5</button>
+                    <button onclick="modifierRes('${type}', -10)" class="btn-minus">-10</button>
+                </div>
+            `;
+            grid.appendChild(section);
+        });
+    }
+
+    function modifierRes(type, valeur) {
+        resistances[type] += valeur;
+        if (resistances[type] < 0) resistances[type] = 0;
+        if (resistances[type] > 100) resistances[type] = 100;
+
+        // Mise à jour du texte et de la barre
+        document.getElementById(`res-val-${type}`).innerText = resistances[type];
+        document.getElementById(`res-fill-${type}`).style.width = resistances[type] + "%";
+        
+        localStorage.setItem('perso_res_' + type, resistances[type]);
+    }
+
+    window.onload = chargerDonnees;
+</script>
+</body>
+</html>

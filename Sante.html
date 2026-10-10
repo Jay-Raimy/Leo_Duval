@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Santé - John Doe</title>
+</head>
+<body>
+    <div class="background">
+        <header class="header flex justify">        
+            <nav>
+                <ul class="menu-nav">
+                    <li class="Button"><a class="main" href="leo_duval.html">Léo Duval</a></li>
+                    <li class="Button"><a class="main" href="Sante.html">Santé</a></li>
+                    <li class="Button"><a class="main" href="Inventaire.html">Inventaire</a></li>
+                    <li class="Button"><a class="main" href="Resistance.html">Résistance</a></li>
+                </ul>
+            </nav>
+        </header>
+    
+        <div class="xp-container">
+            <div class="stats-grid">
+                
+                <div class="stat-section">
+                    <div class="fatigue-label">Fatigue : <span id="fatigue-current-text">0</span> / 100</div>
+                    <div class="bar-bg">
+                        <div id="fatigue-fill" class="bar-fill fatigue-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="controls-grid four-btns">
+                        <button onclick="modifierStat('fatigue', 1)" class="btn-plus">+1</button>
+                        <button onclick="modifierStat('fatigue', 10)" class="btn-plus">+10</button>
+                        <button onclick="modifierStat('fatigue', -1)" class="btn-minus">-1</button>
+                        <button onclick="modifierStat('fatigue', -10)" class="btn-minus">-10</button>
+                    </div>
+                </div>
+
+                <div class="stat-section">
+                    <div class="humanite-label">Humanité : <span id="humanite-current-text">100</span> / 100</div>
+                    <div class="bar-bg">
+                        <div id="humanite-fill" class="bar-fill humanite-fill" style="width: 100%;"></div>
+                    </div>
+                    <div class="controls-grid">
+                        <button onclick="modifierStat('humanite', 10)" class="btn-plus">+10</button>
+                        <button onclick="modifierStat('humanite', -10)" class="btn-minus">-10</button>
+                    </div>
+                </div>
+
+                <div class="stat-section">
+                    <div class="mutagene-label">Mutagène : <span id="mutagene-current-text">0</span> / 100</div>
+                    <div class="bar-bg">
+                        <div id="mutagene-fill" class="bar-fill mutagene-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="controls-grid">
+                        <button onclick="modifierStat('mutagene', 10)" class="btn-plus">+10</button>
+                        <button onclick="modifierStat('mutagene', -10)" class="btn-minus">-10</button>
+                    </div>
+                </div>
+
+                <div class="stat-section">
+                    <div class="faim-label">Faim : <span id="faim-current-text">0</span> / 100</div>
+                    <div class="bar-bg">
+                        <div id="faim-fill" class="bar-fill faim-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="controls-grid four-btns">
+                        <button onclick="modifierStat('faim', 1)" class="btn-plus">+1</button>
+                        <button onclick="modifierStat('faim', 10)" class="btn-plus">+10</button>
+                        <button onclick="modifierStat('faim', -1)" class="btn-minus">-1</button>
+                        <button onclick="modifierStat('faim', -10)" class="btn-minus">-10</button>
+                    </div>
+                </div>
+
+                <div class="stat-section">
+                    <div class="mutagene-label">Mutagène : <span id="mutagene-current-text">0</span> / 100</div>
+                    <div class="bar-bg">
+                        <div id="mutagene-fill" class="bar-fill mutagene-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="controls-grid">
+                        <button onclick="modifierStat('mutagene', 10)" class="btn-plus">+10</button>
+                        <button onclick="modifierStat('mutagene', -10)" class="btn-minus">-10</button>
+                    </div>
+                </div>
+
+                <div class="stat-section">
+                    <div class="soif-label">Soif : <span id="soif-current-text">0</span> / 100</div>
+                    <div class="bar-bg">
+                        <div id="soif-fill" class="bar-fill soif-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="controls-grid four-btns">
+                        <button onclick="modifierStat('soif', 1)" class="btn-plus">+1</button>
+                        <button onclick="modifierStat('soif', 10)" class="btn-plus">+10</button>
+                        <button onclick="modifierStat('soif', -1)" class="btn-minus">-1</button>
+                        <button onclick="modifierStat('soif', -10)" class="btn-minus">-10</button>
+                    </div>
+                </div>
+
+                <div class="stat-section">
+                    <div class="reputation-label">Réputation : <span id="reputation-current-text">0</span> / 150</div>
+                    <div class="bar-bg">
+                        <div id="reputation-fill" class="bar-fill reputation-fill" style="width: 0%;"></div>
+                    </div>
+                    <div class="controls-grid four-btns">
+                        <button onclick="modifierStat('reputation', 1)" class="btn-plus">+1</button>
+                        <button onclick="modifierStat('reputation', 10)" class="btn-plus">+10</button>
+                        <button onclick="modifierStat('reputation', -1)" class="btn-minus">-1</button>
+                        <button onclick="modifierStat('reputation', -10)" class="btn-minus">-10</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+<script>
+    let stats = { 
+        fatigue: 0, faim: 0, soif: 0, 
+        humanite: 100, mutagene: 0, reputation: 0 
+    };
+
+    function chargerDonnees() {
+        for (let s in stats) {
+            const val = localStorage.getItem('perso_' + s);
+            if (val !== null && !isNaN(val)) {
+                stats[s] = parseInt(val);
+            }
+        }
+        rafraichirAffichage();
+    }
+
+    function rafraichirAffichage() {
+        for (let s in stats) {
+            let fill = document.getElementById(s + '-fill');
+            let text = document.getElementById(s + '-current-text');
+            if (fill && text) {
+                let max = (s === 'reputation') ? 150 : 100;
+                let pourcent = (stats[s] / max) * 100;
+                fill.style.width = pourcent + "%";
+                text.innerText = stats[s];
+            }
+        }
+    }
+
+    function modifierStat(type, valeur) {
+        let max = (type === 'reputation') ? 150 : 100;
+        stats[type] += valeur;
+        if (stats[type] > max) stats[type] = max;
+        if (stats[type] < 0) stats[type] = 0;
+        rafraichirAffichage();
+        localStorage.setItem('perso_' + type, stats[type]);
+    }
+
+    window.onload = chargerDonnees;
+</script>
+</body>
+</html>

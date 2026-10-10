@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Léo Duval</title>
+</head>
+<body>
+    <div class="background">
+        <header class="header flex justify">        
+            <nav>
+                <ul class="menu-nav">
+                    <li class="Button"><a class="main" href="leo_duval.html">Léo Duval</a></li>
+                    <li class="Button"><a class="main" href="Sante.html">Santé</a></li>
+                    <li class="Button"><a class="main" href="Inventaire.html">Inventaire</a></li>
+                    <li class="Button"><a class="main" href="Resistance.html">Résistance</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <div class="photo">
+            <img src="Doc/Head.png" style="width : 25vw; height: auto; max-width: 120px;" alt="Portrait">
+        </div>
+
+        <div class="xp-container">
+            <div class="header-stats" style="justify-content: center; gap: 20px;">
+                <div class="level-badge">NIVEAU <span id="level-number">1</span></div>
+                <div class="info-trigger" onclick="toggleInfo()">📜</div>
+            </div>
+
+            <div id="info-panel" class="info-panel">
+                <div class="info-content">
+                    <button class="close-btn" onclick="toggleInfo()">×</button>
+                    <h3>Fiche de Personnage</h3>
+                    <div class="stats-list">
+                        <p><strong>Âge :</strong> 35 ans</p>
+                        <p><strong>Taille :</strong> 1m70</p>
+                        <p><strong>Poids :</strong> 75kg</p>
+                        <p><strong>Peau :</strong> </p>
+                        <p><strong>Bonus :</strong> </p>
+                    </div>
+                    <hr style="opacity: 0.2; margin: 15px 0;">
+                    <p class="flavor-text">"Seule la science nous apportera la lumière..."</p>
+                </div>
+            </div>
+
+            <div class="stat-section">
+                <div class="hp-label" style="color: #2ecc71;">Points de Vie : <span id="hp-current-text">47</span> / 51</div>
+                <div class="bar-bg">
+                    <div id="hp-fill" class="bar-fill" style="width: 100%; background: linear-gradient(90deg, #2ecc71, #27ae60);"></div>
+                </div>
+                <div class="controls-grid">
+                    <button onclick="modifierHP(-1)" class="btn-minus">-1</button>
+                    <button onclick="modifierHP(-10)" class="btn-minus">-10 PV</button>
+                    <button onclick="modifierHP(1)" class="btn-plus">+1</button>
+                    <button onclick="modifierHP(10)" class="btn-plus">+10 PV</button>
+                </div>
+            </div>
+
+            <div class="stat-section">
+                <div class="xp-label" style="color: #f1c40f;">XP : <span id="xp-current-text">350</span> / 500</div>
+                <div class="bar-bg">
+                    <div id="xp-fill" class="bar-fill reputation-fill" style="width: 70%;"></div>
+                </div>
+                <div class="controls-grid">
+                    <button onclick="modifierXP(5)" class="btn-plus">+5</button>
+                    <button onclick="modifierXP(50)" class="btn-plus">+50</button>
+                    <button onclick="modifierXP(-5)" class="btn-minus">-5</button>
+                    <button onclick="modifierXP(-50)" class="btn-minus">-50</button>
+                </div>
+            </div>
+
+            <div class="transfer-box" style="margin-top: 30px; max-width: 250px; margin-left: auto; margin-right: auto;">
+                <h4>Transfert de données</h4>
+                <div class="transfer-btns">
+                    <button onclick="exporterDonnees()" class="btn-transfer exp">Exporter</button>
+                    <button onclick="importerDonnees()" class="btn-transfer imp">Importer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<script>
+    let xpActuel = 0;
+    let xpMax = 500;
+    let niveau = 1;
+    let hpActuel = 51;
+    let hpMax = 51;
+
+    function chargerDonnees() {
+        const xp = localStorage.getItem('perso_xp');
+        const niv = localStorage.getItem('perso_niveau');
+        const hp = localStorage.getItem('perso_hp');
+        if (xp) xpActuel = parseInt(xp);
+        if (niv) niveau = parseInt(niv);
+        if (hp) hpActuel = parseInt(hp);
+        rafraichirAffichage();
+    }
+
+    function sauvegarderDonnees() {
+        localStorage.setItem('perso_xp', xpActuel);
+        localStorage.setItem('perso_niveau', niveau);
+        localStorage.setItem('perso_hp', hpActuel);
+    }
+
+    function rafraichirAffichage() {
+        // Correction ici : ajout de l'opérateur de multiplication (*)
+        document.getElementById('xp-fill').style.width = (xpActuel / xpMax * 100) + "%";
+        document.getElementById('xp-current-text').innerText = xpActuel;
+        document.getElementById('level-number').innerText = niveau;
+        
+        // Correction ici aussi : ajout de l'opérateur de multiplication (*)
+        document.getElementById('hp-fill').style.width = (hpActuel / hpMax * 100) + "%";
+        document.getElementById('hp-current-text').innerText = hpActuel;
+    }
+
+    function modifierXP(v) {
+        xpActuel += v;
+        if (xpActuel >= xpMax) { xpActuel -= xpMax; niveau++; }
+        if (xpActuel < 0) xpActuel = 0;
+        rafraichirAffichage(); 
+        sauvegarderDonnees();
+    }
+
+    function modifierHP(v) {
+        hpActuel += v;
+        if (hpActuel > hpMax) hpActuel = hpMax;
+        if (hpActuel < 0) hpActuel = 0;
+        rafraichirAffichage(); 
+        sauvegarderDonnees();
+    }
+
+    function toggleInfo() {
+        document.getElementById('info-panel').classList.toggle('open');
+    }
+
+    function exporterDonnees() {
+        let toutesLesDonnees = {};
+        for (let i = 0; i < localStorage.length; i++) {
+            let cle = localStorage.key(i);
+            if (cle.startsWith('perso_')) {
+                toutesLesDonnees[cle] = localStorage.getItem(cle);
+            }
+        }
+        const code = btoa(JSON.stringify(toutesLesDonnees));
+        prompt("Copie ce code de transfert :", code);
+    }
+
+    function importerDonnees() {
+        const code = prompt("Colle le code de transfert ici :");
+        if (code) {
+            try {
+                const donnees = JSON.parse(atob(code));
+                for (let cle in donnees) {
+                    localStorage.setItem(cle, donnees[cle]);
+                }
+                alert("✅ Données importées !");
+                location.reload();
+            } catch (e) {
+                alert("❌ Code invalide.");
+            }
+        }
+    }
+
+    window.onload = chargerDonnees;
+</script>
+</body>
+</html>
